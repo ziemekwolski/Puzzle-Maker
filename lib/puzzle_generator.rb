@@ -1,0 +1,1 @@
+require 'puzzle_generator/cutter'
