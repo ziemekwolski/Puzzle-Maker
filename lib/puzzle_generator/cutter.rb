@@ -39,9 +39,20 @@ module PuzzleGenerator
       # go back to the edge of the image.
       piece_width = piece_size 
       piece_height = piece_size
+      end_point_x = start_point_x + piece_width
+      end_point_y = start_point_y + piece_height
       if include_connector_size
-        piece_width += connector_size if start_point_x + piece_width < image_width
-        piece_height += connector_size if start_point_y + piece_height < image_height
+        start_point_x -= connector_size if start_point_x > 0
+        start_point_y -= connector_size if start_point_y > 0
+        piece_width += connector_size if end_point_y < image_width
+        piece_height += connector_size if end_point_y < image_height
+        
+        # If the piece does not border on anything we need to add buffer to all sides, so this piece will
+        # actually be bigger.
+        if end_point_y < image_width && start_point_x > 0 && end_point_y < image_height && start_point_y > 0
+          piece_width += connector_size 
+          piece_height += connector_size
+        end
       end
 
       [start_point_x, start_point_y, piece_width, piece_height]
