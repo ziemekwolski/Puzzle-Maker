@@ -41,18 +41,21 @@ module PuzzleGenerator
       piece_height = piece_size
       end_point_x = start_point_x + piece_width
       end_point_y = start_point_y + piece_height
+      
+      #translating number of pieces to positions
+      horizontal_position = horizontal_pieces - 1
+      vertical_position = vertical_pieces - 1
+      
       if include_connector_size
-        start_point_x -= connector_size if start_point_x > 0
-        start_point_y -= connector_size if start_point_y > 0
-        piece_width += connector_size if end_point_y < image_width
-        piece_height += connector_size if end_point_y < image_height
+        start_point_x -= connector_radius if row_x > 0
+        start_point_y -= connector_radius if row_y > 0
+
+        # if the piece are not on the edges, they are bigger by the radius of the connector.
+        piece_width += connector_radius if row_x < horizontal_position
+        piece_height += connector_radius if row_y < vertical_position
         
-        # If the piece does not border on anything we need to add buffer to all sides, so this piece will
-        # actually be bigger.
-        if end_point_y < image_width && start_point_x > 0 && end_point_y < image_height && start_point_y > 0
-          piece_width += connector_size 
-          piece_height += connector_size
-        end
+        piece_width += connector_radius if row_x > 0 
+        piece_height += connector_radius if row_y > 0
       end
 
       [start_point_x, start_point_y, piece_width, piece_height]
@@ -60,27 +63,80 @@ module PuzzleGenerator
     
     def connector_locations(row_x, row_y)
       points = []
-      pp = piece_points(row_x, row_y, false)
-      height = pp.pop
-      width = pp.pop
       mid = piece_size / 2
+      width = piece_size
+      height = piece_size
+      cr = connector_radius
+      vertical_position = vertical_pieces - 1
+      horizontal_position = horizontal_pieces - 1
       
-      points << [pp[0] + mid, pp[1]]
-      points << [pp[0] + mid, pp[1] + height]
-      points << [pp[0], pp[1] + mid]
-      points << [pp[0] + width, pp[1] + mid]
-      points[0][1] += connector_radius unless border_point?(points[0])
-      points[1][1] += connector_radius unless border_point?(points[1])
-      points[2][0] += connector_radius unless border_point?(points[2])
-      points[3][0] += connector_radius unless border_point?(points[3])
-      points.delete_if {|points| border_point?(points) }
+      points << (row_y == 0 ? nil : [mid, 0])
+      points << (row_y == vertical_position ? nil : [mid, height])
+      points << (row_x == 0 ? nil : [0, mid])
+      points << (row_x == horizontal_position ? nil : [width, mid])
+      
+      if row_y > 0
+        points[0][1] += cr unless points[0].nil?
+        points[1][1] += cr unless points[1].nil?
+        points[2][1] += cr unless points[2].nil?
+        points[3][1] += cr unless points[3].nil?
+      end
+      
+      if row_x > 0 
+        #use loop
+        points[0][0] += cr unless points[0].nil?
+        points[1][0] += cr unless points[1].nil?
+        points[2][0] += cr unless points[2].nil?
+        points[3][0] += cr unless points[3].nil?
+      end
       points
     end
     
-    def border_point?(points)
-      points.include?(0) || points[0] == image_width || points[1] == image_height
+    def rectangle_locations(row_x, row_y)
+      points = []
+      width = piece_size
+      height = piece_size
+      cr = connector_radius
+      vertical_position = vertical_pieces - 1
+      horizontal_position = horizontal_pieces - 1
+      
+      
+      points << (row_y == 0 ? nil : [0,0, width, cr])
+      points << (row_y == vertical_position ? nil : [0,height, width, height + cr])
+      points << (row_x == 0 ? nil : [0,0, cr, height])
+      points << (row_x == horizontal_position ? nil : [width, 0, width + cr, height])
+      
+      if row_x > 0
+        
+        points[0][2] += cr unless points[0].nil?
+        points[1][2] += cr unless points[1].nil?
+        
+        points[3][0] += cr unless points[3].nil?
+        points[3][2] += cr unless points[3].nil?
+      end
+      
+      if row_x <  horizontal_position
+        points[0][2] += cr unless points[0].nil?
+        points[1][2] += cr unless points[1].nil?
+      end
+      
+      if row_y > 0
+        points[1][1] += cr unless points[1].nil?
+        points[1][3] += cr unless points[1].nil?
+        
+        points[2][3] += cr unless points[2].nil?
+        
+        points[3][3] += cr unless points[3].nil?
+      end
+      
+      if row_y < vertical_position
+        points[2][3] += cr unless points[2].nil?
+        points[3][3] += cr unless points[3].nil?
+      end
+      
+      points
     end
-    
+        
     def connector_types(row_x, row_y)
       # Pattern based connectors
       # Top and right connector can be anything. We determine this based on a pattern.
@@ -94,8 +150,6 @@ module PuzzleGenerator
       left = row_x - 1 >= 0 ? (connector_right(row_x -1, row_y) * -1) : nil
       bottom = row_y - 1 >= 0 ? (connector_top(row_x, row_y - 1) * -1) : nil
       
-      puts "BOTTOM #{bottom}, top #{top},left #{left},right #{right}"
-
       [bottom, top , left, right]
     end
     
