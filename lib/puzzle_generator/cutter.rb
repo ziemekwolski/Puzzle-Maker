@@ -5,11 +5,11 @@ module PuzzleGenerator
     attr_accessor :piece_size, :image_width, :image_height
     
     def horizontal_pieces
-      image_width / piece_size
+      (image_width / piece_size).to_i
     end
 
     def vertical_pieces
-      image_height / piece_size
+      (image_height / piece_size).to_i
     end
     
     def connector_size
@@ -61,6 +61,16 @@ module PuzzleGenerator
       [start_point_x, start_point_y, piece_width, piece_height]
     end
     
+    def get_connector_locations_matrix
+      matrix = []
+      vertical_pieces.times do |y_axis|
+        horizontal_pieces.times do |x_axis|
+          matrix << connector_locations(x_axis, y_axis)
+        end
+      end
+      matrix
+    end
+    
     def connector_locations(row_x, row_y)
       points = []
       mid = piece_size / 2
@@ -90,6 +100,16 @@ module PuzzleGenerator
         points[3][0] += cr unless points[3].nil?
       end
       points
+    end
+    
+    def get_rectangle_matrix
+      matrix = []
+      vertical_pieces.times do |y_axis|
+        horizontal_pieces.times do |x_axis|
+          matrix << rectangle_locations(x_axis, y_axis)
+        end
+      end
+      matrix
     end
     
     def rectangle_locations(row_x, row_y)
