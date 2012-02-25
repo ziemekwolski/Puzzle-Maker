@@ -33,17 +33,31 @@ module PuzzleGenerator
         gc.rectangle(*a_rectangle) unless a_rectangle.nil?
       end
       
+      # draw the 4 connectors
+      connector_types = @cutter.connector_types(row_x, row_y)
+      puts connector_types.inspect
+      @cutter.connector_locations(row_x, row_y).each_with_index do |connector, index|
+        unless connector.nil?
+          puts index.inspect
+          gc.fill('#09f700') if connector_types[index] == -1
+          gc.fill('white') if connector_types[index] == 1
+          points = connector
+          points << (connector[0] + @cutter.connector_radius)
+          points << connector[1]
+          gc.circle(*points)
+        end
+      end
+      
       gc.draw(img)
       img = img.matte_replace((bg.columns / 2).to_i,(bg.rows / 2).to_i)
       img = bg.composite(img, Magick::CenterGravity, Magick::OverCompositeOp)
-      # .transparent('#09f700')
-      img.write(folder_location + @file_location.sub(/\..*$/, "-#{row_x}_#{row_y}.gif"))
+      img.transparent('#09f700').write(folder_location + @file_location.sub(/\..*$/, "-#{row_x}_#{row_y}.gif"))
       
     end
     
     def all_piece
-      @cutter.horizontal_pieces.times do |x_axis|
-        @cutter.vertical_pieces.times do |y_axis|
+      @cutter.vertical_pieces.times do |y_axis|
+        @cutter.horizontal_pieces.times do |x_axis|
           single_piece(x_axis, y_axis)
         end
       end
