@@ -8,19 +8,19 @@ Test include a Cutter library written in TDD, image_handler which actually creat
 
 
 Example of usage:
------------------
 
 
-> img_handle = ImageHandler.new
-> 
-> ### set the where the puzzle images should be stored.
-> img_handle.folder_location = "./puzzle_created/made/"
-> 
-> ### set the source file
-> img_handle.source("simple_sample.jpg")
-> 
-> ### generate your pieces.
-> img_handle.all_piece
+```ruby
+img_handle = ImageHandler.new
 
+# set the where the puzzle images should be stored.
+img_handle.folder_location = "./puzzle_created/made/"
+
+# set the source file
+img_handle.source("simple_sample.jpg")
+
+# generate your pieces.
+img_handle.all_piece
+```
 
 To get a visual representation of how this puzzle creator library works, have a look [here](https://github.com/ziemekwolski/Puzzle-Maker/blob/master/test/puzzle_creator_explained.jpg)
