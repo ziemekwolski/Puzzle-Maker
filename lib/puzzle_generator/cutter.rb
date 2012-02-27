@@ -184,5 +184,13 @@ module PuzzleGenerator
       return nil if horizontal_pieces - 1 == row_x
       CONNECTOR_RIGHT_PATTERN[row_x % CONNECTOR_RIGHT_PATTERN.size]
     end
+    
+    def piece_fitting_diamentions
+      horizontal = horizontal_pieces * piece_size
+      vertical = vertical_pieces * piece_size
+      self.image_width = horizontal
+      self.image_height = vertical
+      [0, 0,horizontal ,vertical ]
+    end
   end
 end

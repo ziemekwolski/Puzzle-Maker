@@ -186,4 +186,14 @@ class CutterTest < Test::Unit::TestCase
     assert_equal [1, nil, -1, nil], cutter.connector_types(1,1)
   end
   
+  def test_should_determine_new_size_of_image_based_on_piece_size
+    cutter = Cutter.new
+    cutter.piece_size = 20
+    cutter.image_width = 40
+    cutter.image_height = 65
+    
+    assert_equal [0,0, 40, 60], cutter.piece_fitting_diamentions
+    assert_equal 40, cutter.image_width
+    assert_equal 60, cutter.image_height
+  end
 end
